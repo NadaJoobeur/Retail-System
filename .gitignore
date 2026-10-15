@@ -1,0 +1,30 @@
+.git
+.env
+.DS_Store # macOS specific ignore
+airflow_settings.yaml
+__pycache__/
+astro
+.venv
+airflow-webserver.pid
+webserver_config.py
+airflow.cfg
+airflow.db
+*.json
+
+cat >> .gitignore <<'EOF'
+
+# Local virtual environment
+/venv/
+
+# IDE settings
+/.idea/
+
+# Local Metabase database containing sensitive data
+/include/metabase-data/metabase.db/
+
+# Soda Cloud configuration containing API credentials
+/include/soda/configuration.yml
+
+# Google Cloud service account credentials
+/include/gcp/service_account.json
+EOF
