@@ -1,100 +1,116 @@
-# Retail Data Pipeline Project
+# 🛒 Retail Data Pipeline
 
-Welcome to the Retail Data Pipeline Project! This project is designed to help you learn the ins and outs of creating a robust data pipeline for retail analytics using Apache Airflow. By the end of this project, you will have hands-on experience in setting up and managing a data pipeline, handling data quality checks, integrating dbt for modeling, and leveraging cloud services like Google Cloud Storage and BigQuery.
+Pipeline de données end-to-end pour l'analyse de ventes e-commerce : ingestion dans le cloud, contrôles qualité, modélisation analytique et tableau de bord, le tout orchestré avec **Apache Airflow**.
 
-Tutorial
-https://www.youtube.com/watch?v=DzxtCxi4YaA
+## 🎯 Objectif
 
+Transformer un fichier brut de transactions retail (CSV) en tables analytiques fiables et exploitables dans un outil de BI, en automatisant chaque étape et en vérifiant la qualité des données tout au long du flux.
 
-# DATA-PIPELINE DASHBOARD
-![Data Model](https://raw.githubusercontent.com/OGsiji/airflow-tutorial/main/images/Screen%20Shot%202023-12-13%20at%2012.39.21%20AM.png)
+## 🏗️ Architecture
 
-
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Prerequisites](#prerequisites)
-3. [Getting Started](#getting-started)
-4. [Creating a Data Pipeline with Airflow](#creating-a-data-pipeline-with-airflow)
-5. [Setting up the Local Environment with Astro CLI](#setting-up-the-local-environment-with-astro-cli)
-6. [Running Data Quality Checks with Soda](#running-data-quality-checks-with-soda)
-7. [Integrating dbt and Running Models with Airflow and Comos](#integrating-dbt-and-running-models-with-airflow-and-comos)
-8. [Isolating Tasks to Avoid Dependency Conflicts](#isolating-tasks-to-avoid-dependency-conflicts)
-9. [Uploading a CSV File into Google Cloud Storage](#uploading-a-csv-file-into-google-cloud-storage)
-10. [Ingesting Data into a BigQuery Table using the Astro SDK](#ingesting-data-into-a-bigquery-table-using-the-astro-sdk)
-11. [Additional Resources](#additional-resources)
-12. [Contributing](#contributing)
-13. [License](#license)
-
-## Introduction
-
-In this Retail Data Pipeline Project, you will gain practical knowledge in building a data pipeline that addresses the specific needs of retail analytics. The project covers various aspects such as creating workflows in Apache Airflow, conducting data quality checks, integrating dbt for modeling, and utilizing cloud services like Google Cloud Storage and BigQuery.
-
-## Prerequisites
-
-Before diving into the project, make sure you have the following prerequisites in place:
-- Basic understanding of data pipelines and ETL processes
-- Familiarity with Apache Airflow
-- Access to a Google Cloud Platform (GCP) account
-- Installation of necessary tools like Astro CLI, Soda, and Comos
-
-## Getting Started
-
-Clone this repository to get started with the Retail Data Pipeline Project.
-
-```bash
-git clone https://github.com/your-username/retail-data-pipeline
-cd retail-data-pipeline
+```mermaid
+flowchart LR
+    A[CSV local] --> B[Google Cloud Storage]
+    B --> C[BigQuery<br/>raw_invoices]
+    C --> D{Soda<br/>check_load}
+    D --> E[dbt transform]
+    E --> F{Soda<br/>check_transform}
+    F --> G[dbt report]
+    G --> H{Soda<br/>check_report}
+    G --> I[Metabase]
 ```
 
-## Creating a Data Pipeline with Airflow
+## 🧰 Stack technique
 
-Learn how to design and implement a data pipeline in Airflow from scratch. Understand the concepts of DAGs (Directed Acyclic Graphs) and tasks to orchestrate your workflow efficiently.
+| Domaine | Outils |
+|---|---|
+| Orchestration | Apache Airflow, Astro CLI / Astro Runtime |
+| Stockage & Data Warehouse | Google Cloud Storage, BigQuery |
+| Ingestion | Astro SDK |
+| Transformation | dbt (dbt-bigquery), Cosmos |
+| Qualité des données | Soda Core |
+| Visualisation | Metabase |
+| Infrastructure | Docker, Docker Compose |
+| Langages | Python, SQL |
 
-## Setting up the Local Environment with Astro CLI
+## 📁 Structure du projet
 
-Explore the Astro CLI to set up your local development environment for Airflow. Manage configurations, connections, and environment variables seamlessly.
+```
+├── dags/
+│   └── retail.py              # DAG principal
+├── include/
+│   ├── dataset/               # Données sources (CSV)
+│   ├── dbt/                   # Projet dbt (transform / report)
+│   ├── soda/                  # Configuration et checks Soda
+│   └── metabase-data/         # Données Metabase
+├── tests/                     # Tests d'intégrité des DAGs
+├── Dockerfile                 # Runtime Airflow + venvs isolés (Soda, dbt)
+├── docker-compose.override.yml# Service Metabase
+├── requirements.txt
+└── packages.txt
+```
 
-## Running Data Quality Checks with Soda
+## ⚙️ Fonctionnement du DAG
 
-Implement data quality checks in your pipeline using Soda. Ensure the integrity and reliability of your data by validating against predefined rules.
+| Étape | Description |
+|---|---|
+| `upload_csv_to_gcs` | Envoi du CSV vers un bucket GCS |
+| `create_retail_dataset` | Création du dataset BigQuery |
+| `gcs_to_raw` | Chargement dans la table `raw_invoices` |
+| `check_load` | Contrôles Soda sur les données brutes |
+| `transform` | Modèles dbt de transformation |
+| `check_transform` | Contrôles Soda après transformation |
+| `report` | Modèles dbt de reporting |
+| `check_report` | Contrôles Soda finaux |
 
-## Integrating dbt and Running Models with Airflow and Comos
+**Choix techniques :**
+- Soda et dbt sont installés dans des **environnements virtuels séparés** et appelés via `@task.external_python`, pour éviter les conflits de dépendances avec Airflow.
+- Les modèles dbt sont exécutés comme des **task groups Airflow** grâce à Cosmos, ce qui donne une visibilité modèle par modèle dans l'UI.
+- Un contrôle qualité est placé **après chaque couche** du pipeline.
 
-Discover how to integrate dbt into your Airflow workflow for managing analytics models. Use Comos to streamline the execution of dbt models within your data pipeline.
+## 🚀 Installation
 
-## Isolating Tasks to Avoid Dependency Conflicts
+### Prérequis
+- Docker et Docker Compose
+- Astro CLI
+- Un projet Google Cloud avec BigQuery et Cloud Storage activés
+- Un compte de service GCP (clé JSON)
 
-Learn techniques to isolate tasks within your data pipeline, minimizing dependency conflicts and ensuring a smooth and reliable execution flow.
+### Lancement
 
-## Uploading a CSV File into Google Cloud Storage
+```bash
+git clone <url-de-ton-repo>
+cd <nom-du-repo>
+```
 
-Understand the process of uploading a CSV file into Google Cloud Storage. Utilize GCS as a scalable and reliable storage solution for your data.
+1. Placer la clé du compte de service dans `include/gcp/service_account.json`.
+2. Adapter dans `dags/retail.py` le nom du bucket GCS.
+3. Démarrer l'environnement :
 
-## Ingesting Data into a BigQuery Table using the Astro SDK
+```bash
+astro dev start
+```
 
-Explore the Astro SDK to ingest data into a BigQuery table. Leverage the power of BigQuery for efficient data warehousing and analytics.
+4. Dans l'UI Airflow (`localhost:8080`), créer la connexion **`gcp`** (type Google Cloud) avec la clé du compte de service.
+5. Lancer le DAG `retail`.
+6. Ouvrir Metabase sur `localhost:3000` et connecter BigQuery.
 
+## 📊 Résultats
 
+### Modèle de données
+![Modèle de données](images/data_model.png)
 
-# METABASE DASHBOARD
-![Data Model](https://raw.githubusercontent.com/OGsiji/airflow-tutorial/main/images/WhatsApp%20Image%202023-12-11%20at%2021.55.49.jpeg)
+### Dashboard Metabase
+![Dashboard Metabase](images/metabase_dashboard.png)
 
-# AIRFLOW DASHBOARD
-![Data Model](https://raw.githubusercontent.com/OGsiji/airflow-tutorial/main/images/WhatsApp%20Image%202023-12-11%20at%2022.35.12.jpeg)
+### DAG Airflow
+![DAG Airflow](images/airflow_dag.png)
 
+## 🔮 Améliorations possibles
+- Planifier le DAG (actuellement déclenché manuellement)
+- Ajouter des alertes (Slack / email) en cas d'échec des contrôles Soda
+- Déployer sur un Airflow managé
+- Ajouter une CI pour les tests de DAGs et `dbt test`
 
-
-## Additional Resources
-
-Find additional resources, documentation, and tutorials to enhance your understanding of data pipelines, Airflow, and related technologies.
-
-## Contributing
-
-If you have suggestions, improvements, or would like to contribute to this project, please check the [contribution guidelines](CONTRIBUTING.md).
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-
+## 📄 Licence
+MIT
