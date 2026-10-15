@@ -98,13 +98,13 @@ astro dev start
 ## 📊 Résultats
 
 ### Modèle de données
-![Modèle de données](images/WhatsApp Image 2023-12-11 at 22.35.12.jpeg)
+![Modèle de données](images/WhatsApp%20Image%202023-12-11%20at%2022.35.12.jpeg)
 
 ### Dashboard Metabase
-![Dashboard Metabase](images/WhatsApp Image 2023-12-11 at 21.55.49.jpeg)
+![Dashboard Metabase](images/WhatsApp%20Image%202023-12-11%20at%2021.55.49.jpeg)
 
 ### DAG Airflow
-![DAG Airflow](images/Screen Shot 2023-12-13 at 12.39.21 AM.png)
+![DAG Airflow](images/Screen%20Shot%202023-12-13%20at%2012.39.21%20AM.png)
 
 ## 🔮 Améliorations possibles
 - Planifier le DAG (actuellement déclenché manuellement)
