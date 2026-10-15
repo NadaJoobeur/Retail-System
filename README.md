@@ -98,10 +98,10 @@ astro dev start
 ## 📊 Résultats
 
 ### Modèle de données
-![Modèle de données](images/WhatsApp Image 2023-12-11 at 22.35.12.png)
+![Modèle de données](images/WhatsApp Image 2023-12-11 at 22.35.12.jpeg)
 
 ### Dashboard Metabase
-![Dashboard Metabase](images/WhatsApp Image 2023-12-11 at 21.55.49.png)
+![Dashboard Metabase](images/WhatsApp Image 2023-12-11 at 21.55.49.jpeg)
 
 ### DAG Airflow
 ![DAG Airflow](images/Screen Shot 2023-12-13 at 12.39.21 AM.png)
